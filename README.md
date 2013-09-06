@@ -29,7 +29,33 @@ Please notice that you can pass in the order and where option or leave them out.
 Step 3. View: **app/views/posts/index.ejs**
 
 ```javascript
-    paginate(posts);
+    <%- paginate(posts); %>
+```
+
+OR
+
+```javascript
+	<%- paginate(clients, 3, {
+		paginationClass: 'pagination pagination-centered',
+		next: '&amp;gt;',
+		last: '&amp;gt;&amp;gt;',
+		first: '&amp;lt;&amp;lt;',
+		prev: '&amp;lt;',
+		linkClass: 'btn'
+	}) %>
+```
+
+OR
+
+```javascript
+	<%- paginate(clients, {
+		paginationClass: 'pagination pagination-centered',
+		next: '&amp;gt;',
+		last: '&amp;gt;&amp;gt;',
+		first: '&amp;lt;&amp;lt;',
+		prev: '&amp;lt;',
+		linkClass: 'btn'
+	}) %>
 ```
 
 ## License

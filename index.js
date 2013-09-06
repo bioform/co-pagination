@@ -27,27 +27,52 @@ exports.init = function (compound) {
 };
 
 // global view helper
-function paginateHelper(collection,step) {
-    if (!step) step = 5;
+function paginateHelper(collection,step,params) {
     if (!collection.totalPages || collection.totalPages < 2) return '';
-    var page = parseInt(collection.currentPage, 10);
-    var pages = collection.totalPages;
-    var html = '<div class="pagination">';
-    var prevClass = 'prev' + (page === 1 ? ' disabled': '');
-    var nextClass = 'next' + (page === pages ? ' disabled': '');
+    
+    if (step) {
+    	switch(typeof step) {
+    		case 'number':
+    			step = step;
+				break;
+			case 'object':
+				params = step;
+				step = 5;
+				break;
+		}
+    } else {
+	    step = 5;
+	    params = {};
+    }
+    
+    var page = parseInt(collection.currentPage, 10),
+    	pages = collection.totalPages,
+		html = '<div class="' + (params.paginationClass || "pagination") + '">',
+		prevClass = 'prev' + (page === 1 ? ' disabled': ''),
+		nextClass = 'next' + (page === pages ? ' disabled': ''),
+		linkObj = { class: (params.linkClass || '') }
+    
     html += '<ul><li class="' + prevClass + '">';
-    html += this.link_to('&larr; First', '?page=1');
-    html += this.link_to('&larr; Previous', '?page=' + (page - 1));
+	if(page === 1) {
+		linkObj.disabled = true;
+	}
+    html += this.link_to((params.first || '&larr; First'), '?page=1', linkObj);
+    html += this.link_to((params.prev || '&larr; Previous'), '?page=' + (page - 1), linkObj);
     html += '</li>';
 
     var start = ( page <= step ) ? 1 : page-step;
     var end   = page+step;
-
+		
     if ( page > pages-step )
     {
         start = pages-(step*2);
     }
-
+	
+	if(start < 1)
+	{
+		start = 1;
+	}
+	
     if ( end < (step*2) )
     {
         end = step*2;
@@ -60,14 +85,23 @@ function paginateHelper(collection,step) {
 
     for (var i = start; i <= end; i++ ) {
         if (i == page) {
-            html += '<li class="active"><a href="#">' + i + '</a></li>';
+            html += '<li class="active"><a href="#" class="active ' + (params.linkClass || '') + '">' + i + '</a></li>';
         } else {
-            html += '<li>' + this.link_to(i, '?page=' + i) + '</li>';
+			delete linkObj['disabled'];
+            html += '<li>' + this.link_to(i, '?page=' + i, linkObj) + '</li>';
         }
     }
+    if(page === pages) {
+	    linkObj.disabled = true;
+    } else {
+	    delete linkObj['disabled'];
+    }
+    
+    console.log();
+    
     html += '<li class="' + nextClass + '">';
-    html += this.link_to('Next &rarr;', '?page=' + (page + 1));
-    html += this.link_to('Last &rarr;', '?page=' + pages);
+    html += this.link_to((params.next || 'Next &rarr;'), '?page=' + (page + 1), linkObj);
+    html += this.link_to((params.last || 'Last &rarr;'), '?page=' + pages, linkObj);
     html += '</li></ul></div>';
     return html;
 };
