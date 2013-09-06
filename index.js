@@ -50,13 +50,18 @@ function paginateHelper(collection,step,params) {
 		html = '<div class="' + (params.paginationClass || "pagination") + '">',
 		prevClass = 'prev' + (page === 1 ? ' disabled': ''),
 		nextClass = 'next' + (page === pages ? ' disabled': ''),
-		start = ( page <= step ) ? 1 : page-step,
-    	end   = page+step;
+		linkObj = { class: (params.linkClass || '') }
     
     html += '<ul><li class="' + prevClass + '">';
-    html += this.link_to((params.first || '&larr; First'), '?page=1');
-    html += this.link_to((params.prev || '&larr; Previous'), '?page=' + (page - 1));
+	if(page === 1) {
+		linkObj.disabled = true;
+	}
+    html += this.link_to((params.first || '&larr; First'), '?page=1', linkObj);
+    html += this.link_to((params.prev || '&larr; Previous'), '?page=' + (page - 1), linkObj);
     html += '</li>';
+
+    var start = ( page <= step ) ? 1 : page-step;
+    var end   = page+step;
 		
     if ( page > pages-step )
     {
@@ -80,14 +85,23 @@ function paginateHelper(collection,step,params) {
 
     for (var i = start; i <= end; i++ ) {
         if (i == page) {
-            html += '<li class="active"><a href="#">' + i + '</a></li>';
+            html += '<li class="active"><a href="#" class="active ' + (params.linkClass || '') + '">' + i + '</a></li>';
         } else {
-            html += '<li>' + this.link_to(i, '?page=' + i) + '</li>';
+			delete linkObj['disabled'];
+            html += '<li>' + this.link_to(i, '?page=' + i, linkObj) + '</li>';
         }
     }
+    if(page === pages) {
+	    linkObj.disabled = true;
+    } else {
+	    delete linkObj['disabled'];
+    }
+    
+    console.log();
+    
     html += '<li class="' + nextClass + '">';
-    html += this.link_to((params.next || 'Next &rarr;'), '?page=' + (page + 1));
-    html += this.link_to((params.last || 'Last &rarr;'), '?page=' + pages);
+    html += this.link_to((params.next || 'Next &rarr;'), '?page=' + (page + 1), linkObj);
+    html += this.link_to((params.last || 'Last &rarr;'), '?page=' + pages, linkObj);
     html += '</li></ul></div>';
     return html;
 };

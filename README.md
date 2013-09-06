@@ -40,7 +40,8 @@ OR
 		next: '&amp;gt;',
 		last: '&amp;gt;&amp;gt;',
 		first: '&amp;lt;&amp;lt;',
-		prev: '&amp;lt;'
+		prev: '&amp;lt;',
+		linkClass: 'btn'
 	}) %>
 ```
 
@@ -52,7 +53,8 @@ OR
 		next: '&amp;gt;',
 		last: '&amp;gt;&amp;gt;',
 		first: '&amp;lt;&amp;lt;',
-		prev: '&amp;lt;'
+		prev: '&amp;lt;',
+		linkClass: 'btn'
 	}) %>
 ```
 
