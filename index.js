@@ -47,7 +47,12 @@ function paginateHelper(collection,step) {
     {
         start = pages-(step*2);
     }
-
+	
+	if(start < 1)
+	{
+		start = 1;
+	}
+	
     if ( end < (step*2) )
     {
         end = step*2;
