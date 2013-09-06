@@ -27,22 +27,37 @@ exports.init = function (compound) {
 };
 
 // global view helper
-function paginateHelper(collection,step) {
-    if (!step) step = 5;
+function paginateHelper(collection,step,params) {
     if (!collection.totalPages || collection.totalPages < 2) return '';
-    var page = parseInt(collection.currentPage, 10);
-    var pages = collection.totalPages;
-    var html = '<div class="pagination">';
-    var prevClass = 'prev' + (page === 1 ? ' disabled': '');
-    var nextClass = 'next' + (page === pages ? ' disabled': '');
+    
+    if (step) {
+    	switch(typeof step) {
+    		case 'number':
+    			step = step;
+				break;
+			case 'object':
+				params = step;
+				step = 5;
+				break;
+		}
+    } else {
+	    step = 5;
+	    params = {};
+    }
+    
+    var page = parseInt(collection.currentPage, 10),
+    	pages = collection.totalPages,
+		html = '<div class="' + (params.paginationClass || "pagination") + '">',
+		prevClass = 'prev' + (page === 1 ? ' disabled': ''),
+		nextClass = 'next' + (page === pages ? ' disabled': ''),
+		start = ( page <= step ) ? 1 : page-step,
+    	end   = page+step;
+    
     html += '<ul><li class="' + prevClass + '">';
-    html += this.link_to('&larr; First', '?page=1');
-    html += this.link_to('&larr; Previous', '?page=' + (page - 1));
+    html += this.link_to((params.first || '&larr; First'), '?page=1');
+    html += this.link_to((params.prev || '&larr; Previous'), '?page=' + (page - 1));
     html += '</li>';
-
-    var start = ( page <= step ) ? 1 : page-step;
-    var end   = page+step;
-
+		
     if ( page > pages-step )
     {
         start = pages-(step*2);
@@ -71,8 +86,8 @@ function paginateHelper(collection,step) {
         }
     }
     html += '<li class="' + nextClass + '">';
-    html += this.link_to('Next &rarr;', '?page=' + (page + 1));
-    html += this.link_to('Last &rarr;', '?page=' + pages);
+    html += this.link_to((params.next || 'Next &rarr;'), '?page=' + (page + 1));
+    html += this.link_to((params.last || 'Last &rarr;'), '?page=' + pages);
     html += '</li></ul></div>';
     return html;
 };
