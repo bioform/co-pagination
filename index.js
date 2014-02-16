@@ -28,6 +28,18 @@ exports.init = function (compound) {
 
 // global view helper
 function paginateHelper(collection,step) {
+    // support query params -- RR
+    var query='';
+    var opts=this.controller.context.req.query||{};
+    if(opts.page) delete opts.page;
+    
+    Object.keys(opts).forEach(function(k){
+        if(opts.hasOwnProperty(k)) {
+            if(query) query+='&';
+            query+=k+'='+opts[k];
+        }
+    });
+    
     if (!step) step = 5;
     if (!collection.totalPages || collection.totalPages < 2) return '';
     var page = parseInt(collection.currentPage, 10);
@@ -35,9 +47,10 @@ function paginateHelper(collection,step) {
     var html = '<div class="pagination">';
     var prevClass = 'prev' + (page === 1 ? ' disabled': '');
     var nextClass = 'next' + (page === pages ? ' disabled': '');
-    html += '<ul><li class="' + prevClass + '">';
-    html += this.link_to('&larr; First', '?page=1');
-    html += this.link_to('&larr; Previous', '?page=' + (page - 1));
+    html += '<ul class="pagination">';
+    html += '<li class="' + prevClass + '">';
+    html += this.link_to('&larr; First', '?page=1' + (query?'&'+query:'')); // add existing query params
+    html += this.link_to('&larr; Previous', '?page=' + (page - 1) + (query?'&'+query:''));
     html += '</li>';
 
     var start = ( page <= step ) ? 1 : page-step;
@@ -62,12 +75,12 @@ function paginateHelper(collection,step) {
         if (i == page) {
             html += '<li class="active"><a href="#">' + i + '</a></li>';
         } else {
-            html += '<li>' + this.link_to(i, '?page=' + i) + '</li>';
+            html += '<li>' + this.link_to(i, '?page=' + i + (query?'&'+query:'')) + '</li>';
         }
     }
     html += '<li class="' + nextClass + '">';
-    html += this.link_to('Next &rarr;', '?page=' + (page + 1));
-    html += this.link_to('Last &rarr;', '?page=' + pages);
+    html += this.link_to('Next &rarr;', '?page=' + (page + 1) + (query?'&'+query:'')); // add existing query params
+    html += this.link_to('Last &rarr;', '?page=' + pages + (query?'&'+query:''));
     html += '</li></ul></div>';
     return html;
 };
@@ -82,7 +95,7 @@ function paginateCollection(opts, callback) {
     var Model = this;
 
     if (where != null) {
-        Model.count({where: where}, function (err, totalRecords) {
+        Model.count(where, function (err, totalRecords) { // err...not {where:where} /RR
             Model.all({limit: limit, offset: (page - 1) * limit, order: order, where: where, include: include}, function (err, records) {
                 if (err) return callback(err);
                 records.totalRecords = totalRecords;
