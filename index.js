@@ -47,7 +47,8 @@ function paginateHelper(collection,step) {
     var html = '<div class="pagination">';
     var prevClass = 'prev' + (page === 1 ? ' disabled': '');
     var nextClass = 'next' + (page === pages ? ' disabled': '');
-    html += '<ul><li class="' + prevClass + '">';
+    html += '<ul class="pagination">';
+    html += '<li class="' + prevClass + '">';
     html += this.link_to('&larr; First', '?page=1' + (query?'&'+query:'')); // add existing query params
     html += this.link_to('&larr; Previous', '?page=' + (page - 1) + (query?'&'+query:''));
     html += '</li>';
